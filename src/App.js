@@ -1,32 +1,19 @@
-import { useState } from "react";
-import getPostsTodos from "./api";
+import { useState, useEffect } from "react";
+import { getPostsTodos } from "./api/getPostsTodos";
+import { PostsTodos } from "./components/PostsTodos/PostsTodos";
 import "./App.css";
 
-const App = () => {
+export const App = () => {
   const [titles, setTitles] = useState([]);
 
-  const fetchPostsTodos = (resource) => {
-    getPostsTodos(resource)
-      .then((data) => setTitles(data))
-      .catch((error) => console.error(error));
+  const fetchPostsTodos = async (resource) => {
+    const postsTodos = await getPostsTodos(resource);
+    setTitles(postsTodos);
   };
 
-  return (
-    <div className="App">
-      <button onClick={() => fetchPostsTodos("posts")}>Posts</button>
-      <button onClick={() => fetchPostsTodos("todos")}>Todos</button>
+  useEffect(() => {
+    fetchPostsTodos("posts");
+  }, []);
 
-      <div className="App-list">
-        <h3>Data</h3>
-
-        <ol>
-          {titles.map((title, id) => (
-            <li key={id}>{title.title}</li>
-          ))}
-        </ol>
-      </div>
-    </div>
-  );
+  return <PostsTodos titles={titles} fetchPostsTodos={fetchPostsTodos} />;
 };
-
-export default App;
